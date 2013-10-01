@@ -1,0 +1,13 @@
+#wphead {
+	display:none;
+}
+
+#wpbody-content .wrap h2 a {
+	display:none;
+}
+
+#wpwrap #wpbody .wrap {
+	-moz-box-shadow: none;
+	border:0;
+	
+}
