@@ -6,13 +6,13 @@ Requires at least: 2.71
 Tested up to: 3.2
 Stable tag: trunk
 
- 
+
 == Description ==
 
 The purpose of this plugin is to simplify the back-end for non-technical users.  If you are a web developer using WordPress as a CMS for a client, 99% of the time your client will not need to see the Tools or Plugins menus.  Furthermore, they may not use the comments feature at all.  This plugin will let you hide and rearrange back-end features.
 
 Another useful feature is disabling all the default dashboard metaboxes, leaving only the ones added by plugins.
- 
+
 = New Features =
 * Clean up editor screen: disable pingback, author, slug, and page attribute metaboxes.
 * Hide the WP logo in the top left corner.
@@ -22,12 +22,12 @@ Another useful feature is disabling all the default dashboard metaboxes, leaving
 
 = Features =
 * Relocate "Plugins" and "Settings" links into footer
-* Disable Comments  
-* Disable Tools Menu  
-* Disable Posts  
-* Disable Links  
-* Disable Default Dashboard Widgets  
-* If front page is set to be a static page, it can be highlighted  
+* Disable Comments
+* Disable Tools Menu
+* Disable Posts
+* Disable Links
+* Disable Default Dashboard Widgets
+* If front page is set to be a static page, it can be highlighted
 
 Be sure to visit the Settings page to select which features to disable.
 
@@ -37,15 +37,15 @@ Be sure to visit the Settings page to select which features to disable.
 2. Activate the plugin at the plugin administration page
 3. Configure plugin settings on Settings -> General page
 
-Please see the [wp-invoice plugin home page](http://twincitiestech.com/plugins/wp-simplify/) for details. 
+Please see the [wp-invoice plugin home page](http://twincitiestech.com/plugins/wp-simplify/) for details.
 
 == Frequently Asked Questions ==
 
-Please see the [wp-invoice plugin home page](http://twincitiestech.com/plugins/wp-simplify/) for details. 
+Please see the [wp-invoice plugin home page](http://twincitiestech.com/plugins/wp-simplify/) for details.
 
 == Screenshots ==
 
-1. Example of cleaned up back-end 
+1. Example of cleaned up back-end
 3. Default Dashboard Widgets can be disabled, while the plugin-generated ones are left
 2. Configuration Settings
 
@@ -84,7 +84,7 @@ Please see the [wp-invoice plugin home page](http://twincitiestech.com/plugins/w
 * Added a function_exists check to remove_post_type_support()
 
 = Version 0.56 =
-* Added many new features - as suggested by Barra of  [ScratchWebDesign.com](http://ScratchWebDesign.com) 
+* Added many new features - as suggested by Barra of  [ScratchWebDesign.com](http://ScratchWebDesign.com)
 
 = Version 0.54 =
 * Bug fix: edit_themes and edit_plugins roles re-established upon deactivation, or change of setting.
@@ -95,7 +95,6 @@ Please see the [wp-invoice plugin home page](http://twincitiestech.com/plugins/w
 = Version 0.52 =
 * Added feature to relocate tools menu to footer, as opposed to hiding completely
 
-== Change Log ==
 = Version 0.51 =
 * Fixed bug with plugin-added custom settings pages links being broken
 
