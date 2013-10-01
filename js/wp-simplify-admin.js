@@ -1,26 +1,17 @@
-jQuery(document).ready(function() {
+/**
+ * WP-Simplify Admin
+ *
+ * @author potanin@UD
+ * @version 1.3.1
+ */
+if( typeof jQuery === 'function' ) {
 
-  jQuery('#wp_simplify_settings_tabs').tabs();
-  
-    jQuery(".wp_simplify_show_advanced").click(function() {
-      jQuery(".wp_simplify_advanced_options").toggle();
-    });    
-    
-    jQuery("#blank_wordpress").click(function() {
-    
-      if(!jQuery(".wp_simplify_advanced_options").is(":visible"))
-        return;
+  jQuery( document ).ready( function() {
 
-      var answer = confirm("Are you sure you want to delete all post types, meta data, comments and taxonomies? \nYou cannot undo this - the data will be gone forever.")
-      if (answer){
-        return true;
-      }
-      else{
-        return false;
-      }
+    if( 'function' === typeof jQuery.fn.tabs ) {
+      jQuery( '.wp_simplify_settings_tabs' ).tabs();
+    }
 
+  });
 
-    });
-
-      
-});
+}

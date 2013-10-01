@@ -24,51 +24,98 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */
-
-/** Plugin Version */
-define( 'WP_Simplify_Version', '1.3.1' );
-
-/** Path for Includes */
-define( 'WP_Simplify_Path', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
-
-/** Path for front-end links */
-define( 'WP_Simplify_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
-
-//** Register activation hook -> has to be in the main plugin file */
-register_deactivation_hook( __FILE__, array( 'WP_Simplify', 'handle_deactivation' ) );
-
-/**
- * WP-Simplify General Functions
- *
- * Contains all the general functions used by the plugin.
  *
  * @version 0.60
  * @author Andy Potanin <andy.potanin@usabilitydynamics.com>
- * @package WP-Simplify
+ * @module WP-Simplify
  */
 class WP_Simplify {
 
   /**
+   * WP_Simplify core version.
+   *
+   * @static
+   * @property $version
+   * @type {Object}
+   */
+  public static $version = '1.4.0';
+
+  /**
+   * Textdomain String
+   *
+   * @public
+   * @property text_domain
+   * @var string
+   */
+  public static $text_domain = 'WP_Simplify';
+
+  /**
+   * Plugin Path
+   *
+   * @public
+   * @property path
+   * @var string
+   */
+  public static $path = null;
+
+  /**
+   * Plugin URL
+   *
+   * @public
+   * @property url
+   * @var string
+   */
+  public static $url = null;
+
+  /**
+   * Singleton Instance Reference.
+   *
+   * @public
+   * @static
+   * @property $instance
+   * @type {Object}
+   */
+  public static $instance;
+
+  /**
    * Adds all the plugin hooks
    *
-   *
+   * @for WP_Simplify
+   * @method __construct
    * @since 0.5
    */
-  function WP_Simplify() {
-    global $wpdb;
+  public function __construct() {
 
-    add_action( 'init', array( 'WP_Simplify', 'init' ) );
-    add_action( 'admin_init', array( 'WP_Simplify', 'admin_init' ) );
-    add_action( 'load-options-general.php', array( 'WP_Simplify', 'general_settings_admin' ) );
-    add_action( 'admin_menu', array( 'WP_Simplify', 'admin_menu' ), 99 );
-    add_action( 'admin_head', array( 'WP_Simplify', 'admin_head' ) );
-    add_action( 'favorite_actions', array( 'WP_Simplify', 'favorite_actions' ) );
-    add_action( 'template_redirect', array( 'WP_Simplify', 'template_redirect' ), 1 );
-    add_action( 'widgets_init', array( 'WP_Simplify', 'widgets_init' ) );
-    add_action( 'wp_dashboard_setup', array( 'WP_Simplify', 'wp_dashboard_setup' ) );
+    // Set Variables
+    define( 'WP_Simplify_Path', self::$path = untrailingslashit( plugin_dir_path( __FILE__ ) ) );
+    define( 'WP_Simplify_URL', self::$url = untrailingslashit( plugin_dir_url( __FILE__ ) ) );
 
-    add_action( 'admin_enqueue_scripts', array( 'WP_Simplify', 'admin_enqueue_scripts' ) );
+    // Initialize hooks.
+    add_action( 'after_setup_theme', array( $this, 'after_setup_theme' ) );
+
+    // Register activation hook -> has to be in the main plugin file
+    register_deactivation_hook( __FILE__, array( $this, 'handle_deactivation' ) );
+
+  }
+
+  /**
+   * Setup Primary Hooks
+   *
+   * @method after_setup_theme
+   * @for WP_Simplify
+   */
+  public function after_setup_theme() {
+    add_action( 'init', array( $this, 'init' ) );
+    add_action( 'admin_init', array( $this, 'admin_init' ) );
+    add_action( 'load-options-general.php', array( $this, 'general_settings_admin' ) );
+    add_action( 'admin_menu', array( $this, 'admin_menu' ), 99 );
+    add_action( 'admin_head', array( $this, 'admin_head' ) );
+    add_action( 'favorite_actions', array( $this, 'favorite_actions' ) );
+    add_action( 'template_redirect', array( $this, 'template_redirect' ), 1 );
+    add_action( 'widgets_init', array( $this, 'widgets_init' ) );
+    add_action( 'wp_dashboard_setup', array( $this, 'wp_dashboard_setup' ) );
+    add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
+
   }
 
   /**
@@ -77,7 +124,7 @@ class WP_Simplify {
    * @since 1.3.0
    *
    */
-  function admin_enqueue_scripts() {
+  public function admin_enqueue_scripts() {
     wp_enqueue_style( 'wp-simplify' );
     wp_enqueue_style( 'wp-simplify-printer-fixes' );
   }
@@ -88,7 +135,7 @@ class WP_Simplify {
    * @since 0.60
    *
    */
-  function handle_deactivation() {
+  public function handle_deactivation() {
 
     delete_option( 'wp_simplify' );
 
@@ -111,15 +158,15 @@ class WP_Simplify {
    * @since 0.60
    *
    */
-  function init() {
+  public function init() {
 
     // Plug page actions -> Add Settings Link to plugin overview page
-    add_filter( 'plugin_action_links', array( 'WP_Simplify', 'plugin_action_links' ), 10, 2 );
+    add_filter( 'plugin_action_links', array( $this, 'plugin_action_links' ), 10, 2 );
 
     $wp_simplify = get_option( 'wp_simplify' );
 
-    if( file_exists( WP_Simplify_Path . '/css/wp-simplify-printer-fixes.css' ) ) {
-      wp_register_style( 'wp-simplify-printer-fixes', WP_Simplify_URL . '/css/wp-simplify-printer-fixes.css', '', '', 'print' );
+    if( file_exists( WP_Simplify::get_instance()->url . '/css/wp-simplify-printer-fixes.css' ) ) {
+      wp_register_style( 'wp-simplify-printer-fixes', WP_Simplify::$url . '/css/wp-simplify-printer-fixes.css', '', '', 'print' );
     }
 
     // If no settings exist, do nothing.
@@ -128,11 +175,6 @@ class WP_Simplify {
 
     if( isset( $_REQUEST[ 'wp_simplify_nonce' ] ) ) {
       if( wp_verify_nonce( $_REQUEST[ 'wp_simplify_nonce' ], "wp_simplify_update" ) ) {
-
-        // Perform WordPress blanking
-        if( in_array( 'enabled_advanced_functions', $wp_simplify ) && $_REQUEST[ 'blank_wordpress' ] == 'Blank WordPress' ) {
-          WP_Simplify::blank_wordpress();
-        }
       }
     }
 
@@ -166,7 +208,7 @@ class WP_Simplify {
    * @since 0.60
    *
    */
-  function plugin_action_links( $links, $file ) {
+  public function plugin_action_links( $links, $file ) {
 
     if( $file == 'wp-simplify/wp-simplify.php' ) {
       $settings_link = '<a href="' . admin_url( 'options-general.php#wp_simplify_anchor' ) . '">' . __( 'Settings' ) . '</a>';
@@ -179,25 +221,20 @@ class WP_Simplify {
   /**
    * Deletes all posts, pages, taxonomies and comments.
    *
+   * UI for triggering this method has been removed.
    *
-   * @todo Update to user profper $wpdb table references
+   * @depreciated
    * @since 0.60
-   *
    */
-  function blank_wordpress() {
+  public function blank_wordpress() {
     global $wpdb;
-
-    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}terms" );
-    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}term_relationships" );
-    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}posts" );
-    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}postmeta" );
-    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}comments" );
-    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}commentmeta" );
-    $wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}term_taxonomy" );
-
-    // Delete WP-Property settings if they exist
-    $wpdb->query( "DELETE FROM {$wpdb->prefix}options WHERE option_name = 'wpp_settings'" );
-
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->terms}" );
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->term_relationships}" );
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->posts}" );
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->postmeta}" );
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->comments}" );
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->commentmeta}" );
+    $wpdb->query( "TRUNCATE TABLE {$wpdb->term_taxonomy}" );
   }
 
   /**
@@ -206,7 +243,7 @@ class WP_Simplify {
    *
    * @since 0.5
    */
-  function template_redirect() {
+  public function template_redirect() {
 
     $wp_simplify = get_option( 'wp_simplify' );
 
@@ -231,7 +268,7 @@ class WP_Simplify {
    *
    * @since 0.5
    */
-  function admin_head() {
+  public function admin_head() {
 
     $wp_simplify = get_option( 'wp_simplify' );
 
@@ -292,10 +329,9 @@ class WP_Simplify {
    *
    * @since 1.0
    */
-  function general_settings_admin() {
+  public function general_settings_admin() {
 
     // Load WP-Simplify settings page script
-    wp_enqueue_script( 'jquery-cookie' );
     wp_enqueue_script( 'wp-simplify' );
     wp_enqueue_script( 'jquery-ui-tabs' );
 
@@ -312,7 +348,7 @@ class WP_Simplify {
    *
    * @since 1.0
    */
-  function admin_init() {
+  public function admin_init() {
     global $current_user;
 
     //** Get current user's admin color settings, in case it's basecamp */
@@ -331,46 +367,58 @@ class WP_Simplify {
       }
     }
 
-    //** Allow user-level selction of Basecamp style */
-    wp_admin_css_color( 'basecamp', _x( 'Basecamp', 'admin color scheme' ), WP_Simplify_URL . '/css/admin-basecamp-style.css', array( '#000000', '#3a3a3a', '#666666', '#e5e5e5' ) );
-
     // Register scripts and styles
-    wp_register_script( 'jquery-cookie', WP_Simplify_URL . '/js/jquery.brownie.js', array( 'jquery' ) );
-    wp_register_script( 'wp-simplify', WP_Simplify_URL . '/js/wp-simplify-admin.js', array( 'jquery' ) );
-    wp_register_style( 'wp-simplify', WP_Simplify_URL . '/css/wp-simplify-admin.css' );
+    wp_register_script( 'wp-simplify', WP_Simplify::$url . '/js/wp-simplify-admin.js', array( 'jquery' ) );
+    wp_register_style( 'wp-simplify', WP_Simplify::$url . '/css/wp-simplify-admin.css' );
 
     // Add the field with the names and function to use for our new settings, put it in our new section
-    add_settings_field( 'wp_simplify', 'WP-Simplify Settings', array( 'WP_Simplify', 'settings_page' ), 'general' );
+    add_settings_field( 'wp_simplify', 'WP-Simplify Settings', array( $this, 'settings_page' ), 'general' );
 
     // Register our setting so that $_POST handling is done for us and our callback function just has to echo the <input>
     register_setting( 'general', 'wp_simplify' );
 
-    add_filter( 'admin_user_info_links', array( 'WP_Simplify', 'admin_user_info_links' ), 0, 2 );
+    add_filter( 'admin_user_info_links', array( $this, 'admin_user_info_links' ), 0, 2 );
 
     // Enable Post and Page Locking
     if( in_array( 'allow_post_locking', $wp_simplify ) ) {
-      add_action( 'post_submitbox_misc_actions', array( 'WP_Simplify', 'show_post_locking_checkbox' ) );
-      add_action( 'save_post', array( 'WP_Simplify', 'save_post' ), 0, 2 );
-      add_action( 'delete_post', array( 'WP_Simplify', 'delete_post' ) );
-      add_action( 'trash_post', array( 'WP_Simplify', 'delete_post' ) );
-      add_filter( 'post_updated_messages', array( 'WP_Simplify', 'post_updated_messages' ) );
+      add_action( 'post_submitbox_misc_actions', array( $this, 'show_post_locking_checkbox' ) );
+      add_action( 'save_post', array( $this, 'save_post' ), 0, 2 );
+      add_action( 'delete_post', array( $this, 'delete_post' ) );
+      add_action( 'trash_post', array( $this, 'delete_post' ) );
+      add_filter( 'post_updated_messages', array( $this, 'post_updated_messages' ) );
     }
 
-    //** If basecamp style is globally enforced we load the CSS */
-    if( in_array( 'basecamp_style', $wp_simplify ) ) {
-      wp_register_style( 'basecamp', WP_Simplify_URL . '/css/admin-basecamp-style.css' );
-      add_action( 'admin_enqueue_scripts', create_function( '', " wp_enqueue_style('basecamp'); " ) );
-    }
+    // Basecamp Styles are broken on new versions.
+    if( version_compare( get_bloginfo( 'version' ), '3.0.0', '<' ) ) {
 
-    //** If Basecamp style is either globally enforced, or set by user, we load scripts and do other stuff */
-    if( $current_color == 'basecamp' || in_array( 'basecamp_style', $wp_simplify ) ) {
-      add_filter( "admin_body_class", create_function( '', ' return "wp_simplify_basecamp_style admin-color-basecamp"; ' ) );
-      wp_enqueue_script( 'basecamp-script', WP_Simplify_URL . '/js/basecamp-script.js', array( 'jquery' ) );
+      // Allow user-level selction of Basecamp style
+      wp_admin_css_color( 'basecamp', _x( 'Basecamp', 'admin color scheme' ), WP_Simplify::$url . '/css/admin-basecamp-style.css', array( '#000000', '#3a3a3a', '#666666', '#e5e5e5' ) );
+
+      // If basecamp style is globally enforced we load the CSS
+      if( in_array( 'basecamp_style', $wp_simplify ) ) {
+        wp_register_style( 'basecamp', WP_Simplify::$url . '/css/admin-basecamp-style.css' );
+        add_action( 'admin_enqueue_scripts', create_function( '', " wp_enqueue_style('basecamp'); " ) );
+      }
+
+      // If Basecamp style is either globally enforced, or set by user, we load scripts and do other stuff
+      if( $current_color == 'basecamp' || in_array( 'basecamp_style', $wp_simplify ) ) {
+        add_filter( "admin_body_class", create_function( '', ' return "wp_simplify_basecamp_style admin-color-basecamp"; ' ) );
+        wp_enqueue_script( 'basecamp-script', WP_Simplify::$url . '/js/basecamp-script.js', array( 'jquery' ) );
+      }
+
     }
 
   }
 
-  function admin_user_info_links( $links, $current_user ) {
+  /**
+   * admin_user_info_links
+   *
+   * @param $links
+   * @param $current_user
+   *
+   * @return mixed
+   */
+  public function admin_user_info_links( $links, $current_user ) {
 
     $links[ 5 ] = str_replace( "Howdy, ", "", $links[ 5 ] );
 
@@ -383,7 +431,7 @@ class WP_Simplify {
    *
    * @since 1.0
    */
-  function show_post_locking_checkbox() {
+  public function show_post_locking_checkbox() {
     global $post_id;
 
     $wps_locked_post = get_post_meta( $post_id, 'wps_locked_post', true );
@@ -403,10 +451,10 @@ class WP_Simplify {
    *
    * @since 1.0
    */
-  function save_post( $post_ID, $post ) {
+  public function save_post( $post_ID, $post ) {
 
     if( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
-      return $post_id;
+      return $post_ID;
     }
 
     // Save locked_post status
@@ -419,7 +467,7 @@ class WP_Simplify {
    *
    * @since 1.0
    */
-  function delete_post( $post_id ) {
+  public function delete_post( $post_id ) {
 
     $wps_locked_post = get_post_meta( $post_id, 'wps_locked_post', true );
 
@@ -436,7 +484,7 @@ class WP_Simplify {
    *
    * @since 1.0
    */
-  function post_updated_messages( $messages ) {
+  public function post_updated_messages( $messages ) {
 
     $messages[ 'post' ][ '1911' ] = __( 'This post is locked so it cannot be deleted or trashed. Unlock first to delete.' );
     $messages[ 'page' ][ '1911' ] = __( 'This post is locked so it cannot be deleted or trashed. Unlock first to delete.' );
@@ -452,7 +500,7 @@ class WP_Simplify {
    *
    * @since 1.1
    */
-  function remove_ui_elements( $post_type, $remove_elements ) {
+  public function remove_ui_elements( $post_type, $remove_elements ) {
     global $wp_meta_boxes, $_wp_post_type_features;
 
     // Remove Metaboxes
@@ -485,7 +533,7 @@ class WP_Simplify {
    *
    * @since 1.0
    */
-  function wp_dashboard_setup() {
+  public function wp_dashboard_setup() {
 
     $wp_simplify = get_option( 'wp_simplify' );
 
@@ -528,7 +576,7 @@ class WP_Simplify {
    *
    * @since 1.0
    */
-  function widgets_init() {
+  public function widgets_init() {
 
     $wp_simplify = get_option( 'wp_simplify' );
 
@@ -557,7 +605,7 @@ class WP_Simplify {
    *
    * @since 1.0
    */
-  function favorite_actions( $actions ) {
+  public function favorite_actions( $actions ) {
 
     $wp_simplify = get_option( 'wp_simplify' );
 
@@ -594,7 +642,7 @@ class WP_Simplify {
    *
    * @since 0.5
    */
-  function admin_menu() {
+  public function admin_menu() {
     global $menu, $submenu;
 
     $wp_simplify = get_option( 'wp_simplify' );
@@ -658,7 +706,7 @@ class WP_Simplify {
       // Hide tools menu
       unset( $menu[ 75 ] );
 
-      add_filter( 'admin_footer_text', array( 'WP_Simplify', 'relocated_nav_components' ) );
+      add_filter( 'admin_footer_text', array( $this, 'relocated_nav_components' ) );
 
       //** Modify default WP password reset message */
       add_filter( "admin_body_class", create_function( '', ' return "wp_simplify_footer_relocated_links"; ' ) );
@@ -677,11 +725,11 @@ class WP_Simplify {
   }
 
   /**
-   * {description missing}
+   * relocated_nav_components
    *
    * @since 1.0
    */
-  function relocated_nav_components() {
+  public function relocated_nav_components() {
     global $submenu;
 
     $this_menu = $submenu;
@@ -734,12 +782,11 @@ class WP_Simplify {
   }
 
   /**
-   * {description missing}
+   * settings_page
    *
    * @since 1.0
    */
-  function settings_page() {
-    $checked = "";
+  public function settings_page() {
 
     // Mark our checkbox as checked if the setting is already true
     $wp_simplify = get_option( 'wp_simplify' );
@@ -751,40 +798,39 @@ class WP_Simplify {
 
     <input type="hidden" name="wp_simplify_nonce" value="<?php echo wp_create_nonce( 'wp_simplify_update' ); ?>"/>
     <a name="wp_simplify_anchor"></a>
-    <div id="wp_simplify_settings_tabs">
+    <div class="wp_simplify_settings_tabs">
     <ul class="wps_section_tabs">
         <li><a href="#wps_major_compontents"><?php _e( 'Major Components' ); ?></a></li>
         <li><a href="#wps_simplify_ui"><?php _e( 'Simplify UI' ); ?></a></li>
         <li><a href="#wps_miscellaneous"><?php _e( 'Miscellaneous' ); ?></a></li>
         <li><a href="#wps_security"><?php _e( 'Security' ); ?></a></li>
-      <?php if( in_array( 'enabled_advanced_functions', $wp_simplify ) ) { ?>
-        <li><a href="#wps_advanced_fetures"><?php _e( 'Advanced Features' ); ?></a></li>
-      <?php } ?>
       </ul>
 
     <div id="wps_major_compontents" class="wp-tab-panel">
       <ul>
-        <li><input name='wp_simplify[]' id='disable_posts' type='checkbox' value='disable_posts' class='code'  <?php if( in_array( 'disable_posts', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_posts"> Disable Posts</label>
-        <li><input name='wp_simplify[]' id='disable_pages' type='checkbox' value='disable_pages' class='code'  <?php if( in_array( 'disable_pages', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_pages"> Disable Pages</label>
-        <li><input name='wp_simplify[]' id='disable_links' type='checkbox' value='disable_links' class='code'  <?php if( in_array( 'disable_links', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_links"> Disable Links</label>
-        <li><input name='wp_simplify[]' id='disable_media' type='checkbox' value='disable_media' class='code'  <?php if( in_array( 'disable_media', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_media"> Disable Media. <span class="description">Images can still be uploaded, this only hides the link from nav menu.</span></label>
-        <li><input name='wp_simplify[]' id='disable_comments' type='checkbox' value='disable_comments' class='code' <?php if( in_array( 'disable_comments', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_comments"> Disable Comments. <span class="description">Doesn't affect the front-end.</span></label>
-        <li><input name='wp_simplify[]' id='disable_appearance' type='checkbox' value='disable_appearance' class='code'  <?php if( in_array( 'disable_appearance', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_appearance"> Disable Appearance</label>
-        <li><input name='wp_simplify[]' id='disable_users' type='checkbox' value='disable_users' class='code'  <?php if( in_array( 'disable_users', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_users"> Disable Users</label>
+        <li><input name='wp_simplify[]' id='disable_posts' type='checkbox' value='disable_posts' class='code'  <?php if( in_array( 'disable_posts', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_posts"> Disable Posts</label></li>
+        <li><input name='wp_simplify[]' id='disable_pages' type='checkbox' value='disable_pages' class='code'  <?php if( in_array( 'disable_pages', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_pages"> Disable Pages</label></li>
+        <li><input name='wp_simplify[]' id='disable_links' type='checkbox' value='disable_links' class='code'  <?php if( in_array( 'disable_links', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_links"> Disable Links</label></li>
+        <li><input name='wp_simplify[]' id='disable_media' type='checkbox' value='disable_media' class='code'  <?php if( in_array( 'disable_media', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_media"> Disable Media. <span class="description">Images can still be uploaded, this only hides the link from nav menu.</span></label></li>
+        <li><input name='wp_simplify[]' id='disable_comments' type='checkbox' value='disable_comments' class='code' <?php if( in_array( 'disable_comments', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_comments"> Disable Comments. <span class="description">Doesn't affect the front-end.</span></label></li>
+        <li><input name='wp_simplify[]' id='disable_appearance' type='checkbox' value='disable_appearance' class='code'  <?php if( in_array( 'disable_appearance', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_appearance"> Disable Appearance</label></li>
+        <li><input name='wp_simplify[]' id='disable_users' type='checkbox' value='disable_users' class='code'  <?php if( in_array( 'disable_users', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_users"> Disable Users</label></li>
       </ul>
     </div>
 
 
     <div id="wps_simplify_ui" class="wp-tab-panel">
       <ul>
-        <li><input name='wp_simplify[]' id='disable_useless_metaboxes' type='checkbox' value='disable_useless_metaboxes' class='code'  <?php if( in_array( 'disable_useless_metaboxes', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_useless_metaboxes"> Clean up editor screen. <span class="description">Disable pingback, author, slug, and page attribute metaboxes.</span></label>
-        <li><input name='wp_simplify[]' id='disable_relocate_admin_menu_links' type='checkbox' value='disable_relocate_admin_menu_links' class='code'  <?php if( in_array( 'disable_relocate_admin_menu_links', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_relocate_admin_menu_links"> Relocate Settings, Tools and Plugins into Footer Text.</label>
-        <li><input name='wp_simplify[]' id='highlight_homepage' type='checkbox' value='highlight_homepage' class='code'  <?php if( in_array( 'highlight_homepage', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="highlight_homepage"> If front page is selected to be a static page, highlight it in back-end.</label>
-        <li><input name='wp_simplify[]' id='disable_wp_logo' type='checkbox' value='disable_wp_logo' class='code'  <?php if( in_array( 'disable_wp_logo', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_wp_logo"> Hide the WP logo in the top left corner.</label>
-        <li><input name='wp_simplify[]' id='disable_right_now_widget' type='checkbox' value='disable_right_now_widget' class='code'  <?php if( in_array( 'disable_right_now_widget', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_right_now_widget"> Disable 'Right Now' Dashboard Metabox.  </label>
-        <li><input name='wp_simplify[]' id='disable_dashboard_metaboxes' type='checkbox' value='disable_dashboard_metaboxes' class='code'  <?php if( in_array( 'disable_dashboard_metaboxes', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_dashboard_metaboxes"> Better yet, disable <b>all</b> default dashboard metaboxes.</label>
-        <li><input name='wp_simplify[]' id='basecamp_style' type='checkbox' value='basecamp_style' class='code'  <?php if( in_array( 'basecamp_style', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="basecamp_style"> Force Basecamp admin style for all users.</label>
-        <li><input name='wp_simplify[]' id='disable_pointers' type='checkbox' value='disable_pointers' class='code'  <?php if( in_array( 'disable_pointers', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_pointers"> Disable WP 3.3 tool tips for all users.</label>
+        <li><input name='wp_simplify[]' id='disable_useless_metaboxes' type='checkbox' value='disable_useless_metaboxes' class='code'  <?php if( in_array( 'disable_useless_metaboxes', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_useless_metaboxes"> Clean up editor screen. <span class="description">Disable pingback, author, slug, and page attribute metaboxes.</span></label></li>
+        <li><input name='wp_simplify[]' id='disable_relocate_admin_menu_links' type='checkbox' value='disable_relocate_admin_menu_links' class='code'  <?php if( in_array( 'disable_relocate_admin_menu_links', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_relocate_admin_menu_links"> Relocate Settings, Tools and Plugins into Footer Text.</label></li>
+        <li><input name='wp_simplify[]' id='highlight_homepage' type='checkbox' value='highlight_homepage' class='code'  <?php if( in_array( 'highlight_homepage', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="highlight_homepage"> If front page is selected to be a static page, highlight it in back-end.</label></li>
+        <li><input name='wp_simplify[]' id='disable_wp_logo' type='checkbox' value='disable_wp_logo' class='code'  <?php if( in_array( 'disable_wp_logo', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_wp_logo"> Hide the WP logo in the top left corner.</label></li>
+        <li><input name='wp_simplify[]' id='disable_right_now_widget' type='checkbox' value='disable_right_now_widget' class='code'  <?php if( in_array( 'disable_right_now_widget', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_right_now_widget"> Disable 'Right Now' Dashboard Metabox.  </label></li>
+        <li><input name='wp_simplify[]' id='disable_dashboard_metaboxes' type='checkbox' value='disable_dashboard_metaboxes' class='code'  <?php if( in_array( 'disable_dashboard_metaboxes', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_dashboard_metaboxes"> Better yet, disable <b>all</b> default dashboard metaboxes.</label></li>
+        <?php if( version_compare( get_bloginfo( 'version' ), '3.0.0', '<' ) ) { ?>
+          <li><input name='wp_simplify[]' id='basecamp_style' type='checkbox' value='basecamp_style' class='code'  <?php if( in_array( 'basecamp_style', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="basecamp_style"> Force Basecamp admin style for all users.</label></li>
+        <?php } ?>
+        <li><input name='wp_simplify[]' id='disable_pointers' type='checkbox' value='disable_pointers' class='code'  <?php if( in_array( 'disable_pointers', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_pointers"> Disable WP 3.3 tool tips for all users.</label></li>
       </ul>
     </div>
 
@@ -804,34 +850,18 @@ class WP_Simplify {
 
       <li><input name='wp_simplify[]' id='disable_quick_edit_link' type='checkbox' value='disable_quick_edit_link' class='code'  <?php if( in_array( 'disable_quick_edit_link', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_quick_edit_link"> Hide the "Quick Edit" link on post & page overview pages.</label>
       <li><input name='wp_simplify[]' id='disable_theme_editor' type='checkbox' value='disable_theme_editor' class='code'  <?php if( in_array( 'disable_theme_editor', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_theme_editor"> Disable theme editing for all users via control panel (prevents potential security risk).</label>
-      <li><input name='wp_simplify[]' id='enabled_advanced_functions' type='checkbox' value='enabled_advanced_functions' class='code'  <?php if( in_array( 'enabled_advanced_functions', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="enabled_advanced_functions"> <?php _e( 'Enable advanced WP-Simplify functions such as WordPress blanking' ); ?>
-          <span class="description"> <?php _e( 'Warning: use advanced features at your own risk.' ); ?></span></label>
 
       </ul>
     </div>
 
     <div id="wps_security" class="wp-tab-panel">
       <ul>
-        <li><input name='wp_simplify[]' id='disable_backend_access_to_non_admins' type='checkbox' value='disable_backend_access_to_non_admins' class='code'  <?php if( in_array( 'disable_backend_access_to_non_admins', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_backend_access_to_non_admins"> Disable back-end access to non-administrators. <span class="description">If enabled, on attempt to access /wp-admin, non-level 10 administrators will be forwarded to the frontend. This can be overwritten if uses has "access_backend" capability.</span></label>
-        <li><input name='wp_simplify[]' id='force_ssl_on_front_end' type='checkbox' value='force_ssl_on_front_end' class='code'  <?php if( in_array( 'force_ssl_on_front_end', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="force_ssl_on_front_end"> Always use SSL on front-end. <span class="description"></span></label>
+        <li><input name='wp_simplify[]' id='disable_backend_access_to_non_admins' type='checkbox' value='disable_backend_access_to_non_admins' class='code'  <?php if( in_array( 'disable_backend_access_to_non_admins', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_backend_access_to_non_admins"> Disable back-end access to non-administrators. <span class="description">If enabled, on attempt to access /wp-admin, non-level 10 administrators will be forwarded to the frontend. This can be overwritten if uses has "access_backend" capability.</span></label></li>
+        <li><input name='wp_simplify[]' id='force_ssl_on_front_end' type='checkbox' value='force_ssl_on_front_end' class='code'  <?php if( in_array( 'force_ssl_on_front_end', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="force_ssl_on_front_end"> Always use SSL on front-end. <span class="description"></span></label></li>
         <li><input name='wp_simplify[]' id='allow_post_locking' type='checkbox' value='allow_post_locking' class='code'  <?php if( in_array( 'allow_post_locking', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="allow_post_locking"> <?php _e( 'Allow post locking.' ); ?>
-            <span class="description"><?php _( 'Willl show checkbox on post and page editing screens which will let you "lock" posts - or prevent them from being deleted.' ); ?></span></label>
+            <span class="description"><?php _( 'Willl show checkbox on post and page editing screens which will let you "lock" posts - or prevent them from being deleted.' ); ?></span></label></li>
       </ul>
     </div>
-
-    <?php if( in_array( 'enabled_advanced_functions', $wp_simplify ) ) { ?>
-      <div id="wps_advanced_fetures" class="wp-tab-panel">
-     <span class="wp_simplify_show_advanced" style='cursor: pointer;'><?php _e( 'Toggle Advanced Functions.' ); ?></span>
-      <ul class="hidden wp_simplify_advanced_options">
-        <li>
-          <input type='submit' value='Blank WordPress' name='blank_wordpress' id='blank_wordpress'/>
-          <label for="blank_wordpress">
-          Warning! Blanking WordPress will remove all posts, pages and post meta.  Do not do this on a live site!
-          </label>
-        </li>
-      </ul>
-    </div>
-    <?php } /* Advanced Features */ ?>
 
     </div><?php /* End WP-Simplify Tabs */ ?>
 
@@ -839,6 +869,27 @@ class WP_Simplify {
 
   } // settings_page()
 
+  /**
+   * Get the WP-Simplify Singleton
+   *
+   * Concept based on the CodeIgniter get_instance() concept.
+   *
+   * @example
+   *
+   *      var settings = WP_Simplify::get_instance()->Settings;
+   *      var api = WP_Simplify::$instance()->API;
+   *
+   * @static
+   * @return object
+   *
+   * @method get_instance
+   * @for WP_Simplify
+   */
+  public static function &get_instance() {
+    return self::$instance;
+  }
+
 }
 
-add_action( 'after_setup_theme', create_function( '', 'new WP_Simplify;' ) );
+// Intialize Plugin
+new WP_Simplify;

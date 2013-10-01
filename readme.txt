@@ -51,6 +51,10 @@ Please see the [wp-invoice plugin home page](http://twincitiestech.com/plugins/w
 
 == Change Log ==
 
+= Version 1.4.0 =
+* General updates and code cleanup.
+* Restricted Basecamp style to legacy version of WordPress.
+
 = Version 1.3.0 =
 * WordPress 3.3 compatibility.
 
