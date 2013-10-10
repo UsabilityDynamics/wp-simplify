@@ -183,7 +183,7 @@ class WP_Simplify {
 
       $WP_Roles = new WP_Roles;
 
-      foreach( $WP_Roles->roles as $role => $role_caps ) {
+      foreach( (array) $WP_Roles->roles as $role => $role_caps ) {
 
         if( $role == 'administrator' ) {
           $WP_Roles->add_cap( $role, 'edit_themes' );
@@ -194,7 +194,7 @@ class WP_Simplify {
 
     } else {
       $WP_Roles = new WP_Roles;
-      foreach( $WP_Roles->roles as $role => $role_caps ) {
+      foreach( (array) $WP_Roles->roles as $role => $role_caps ) {
         $WP_Roles->remove_cap( $role, 'edit_themes' );
         $WP_Roles->remove_cap( $role, 'edit_plugins' );
       }
