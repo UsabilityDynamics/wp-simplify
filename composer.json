@@ -12,6 +12,9 @@
     "wordpress",
     "provision"
   ],
+  "autoload": {
+    "files": [ "wp-simplify.php" ]
+  },
   "minimum-stability": "dev",
   "license": "GPLv2",
   "authors": [
@@ -24,6 +27,5 @@
   "require": {
     "php": ">=5.3"
   },
-  "autoload": {},
   "config": {}
 }
