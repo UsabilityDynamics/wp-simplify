@@ -1,0 +1,29 @@
+
+{
+  "name": "usabilitydynamics/wp-simplify",
+  "type": "library",
+  "description": "WordPress plugin for simplifying the UI.",
+  "repository": {
+    "type": "git",
+    "urL": "https://github.com/UsabilityDynamics/wp-simplify"
+  },
+  "homepage": "https://github.com/UsabilityDynamics/wp-simplify",
+  "keywords": [
+    "wordpress",
+    "provision"
+  ],
+  "minimum-stability": "dev",
+  "license": "GPLv2",
+  "authors": [
+    {
+      "name": "Andy Potanin",
+      "homepage": "http://usabilitydynamics.com"
+    }
+  ],
+  "repositories": [],
+  "require": {
+    "php": ">=5.3"
+  },
+  "autoload": {},
+  "config": {}
+}
