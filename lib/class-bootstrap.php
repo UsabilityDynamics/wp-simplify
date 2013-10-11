@@ -62,8 +62,8 @@ namespace UsabilityDynamics\Simplify {
     public function __construct() {
 
       // Set Variables
-      define( 'WP_Simplify_Path', self::$path = untrailingslashit( plugin_dir_path( __FILE__ ) ) );
-      define( 'WP_Simplify_URL', self::$url = untrailingslashit( plugin_dir_url( __FILE__ ) ) );
+      self::$path = untrailingslashit( plugin_dir_path( __FILE__ ) );
+      self::$url  = untrailingslashit( plugin_dir_url( __FILE__ ) );
 
       // Initialize hooks.
       add_action( 'after_setup_theme', array( $this, 'after_setup_theme' ) );
@@ -90,7 +90,6 @@ namespace UsabilityDynamics\Simplify {
       add_action( 'widgets_init', array( $this, 'widgets_init' ) );
       add_action( 'wp_dashboard_setup', array( $this, 'wp_dashboard_setup' ) );
       add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
-
     }
 
     /**
@@ -342,9 +341,14 @@ namespace UsabilityDynamics\Simplify {
         }
       }
 
-      // Register scripts and styles
-      wp_register_script( 'wp-simplify', self::$url . '/js/wp-simplify-admin.js', array( 'jquery' ) );
-      wp_register_style( 'wp-simplify', self::$url . '/css/wp-simplify-admin.css' );
+      // Register scripts and styles if they can be resolved
+      if( file_exists( self::$path . '/js/wp-simplify-admin.js' ) ) {
+        wp_register_script( 'wp-simplify', self::$url . '/js/wp-simplify-admin.js', array( 'jquery' ) );
+      }
+
+      if( file_exists( self::$path . '/css/wp-simplify-admin.css' ) ) {
+        wp_register_style( 'wp-simplify', self::$url . '/css/wp-simplify-admin.css' );
+      }
 
       // Add the field with the names and function to use for our new settings, put it in our new section
       add_settings_field( 'wp_simplify', 'WP-Simplify Settings', array( $this, 'settings_page' ), 'general' );
@@ -394,11 +398,9 @@ namespace UsabilityDynamics\Simplify {
      * @return mixed
      */
     public function admin_user_info_links( $links, $current_user ) {
-
       $links[ 5 ] = str_replace( "Howdy, ", "", $links[ 5 ] );
 
       return $links;
-
     }
 
     /**
