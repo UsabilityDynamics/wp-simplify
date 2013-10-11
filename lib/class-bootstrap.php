@@ -13,7 +13,7 @@ namespace UsabilityDynamics\Simplify {
      * @property $version
      * @type {Object}
      */
-    public static $version = '1.4.0';
+    public static $version = '1.4.1';
 
     /**
      * Textdomain String
