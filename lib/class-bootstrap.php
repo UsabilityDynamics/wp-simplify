@@ -139,7 +139,7 @@ namespace UsabilityDynamics\Simplify {
 
       $wp_simplify = get_option( 'wp_simplify' );
 
-      if( file_exists( self::get_instance()->url . '/css/wp-simplify-printer-fixes.css' ) ) {
+      if( file_exists( @self::get_instance()->url . '/css/wp-simplify-printer-fixes.css' ) ) {
         wp_register_style( 'wp-simplify-printer-fixes', self::$url . '/css/wp-simplify-printer-fixes.css', '', '', 'print' );
       }
 
