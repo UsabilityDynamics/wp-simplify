@@ -13,7 +13,7 @@
     "provision"
   ],
   "autoload": {
-    "files": [
+    "classmap": [
       "lib/class-bootstrap.php",
       "lib/class-simplify.php"
     ]
