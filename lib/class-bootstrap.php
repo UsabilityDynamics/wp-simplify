@@ -64,6 +64,7 @@ namespace UsabilityDynamics\Simplify {
       // Set Variables
       self::$path = untrailingslashit( plugin_dir_path( dirname( __FILE__ ) ) );
       self::$url  = untrailingslashit( plugin_dir_url( dirname( __FILE__ ) ) );
+      
 
       // Initialize hooks.
       add_action( 'after_setup_theme', array( $this, 'after_setup_theme' ) );
