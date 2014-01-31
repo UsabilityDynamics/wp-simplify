@@ -62,8 +62,8 @@ namespace UsabilityDynamics\Simplify {
     public function __construct() {
 
       // Set Variables
-      self::$path = untrailingslashit( plugin_dir_path( dirname( __FILE__ ) ) );
-      self::$url  = untrailingslashit( plugin_dir_url( dirname( __FILE__ ) ) );
+      self::$path = untrailingslashit( plugin_dir_path( dirname( __DIR__ ) ) );
+      self::$url  = untrailingslashit( plugin_dir_url( dirname( __DIR__ ) ) );
       
 
       // Initialize hooks.
