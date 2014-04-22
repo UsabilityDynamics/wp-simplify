@@ -62,9 +62,8 @@ namespace UsabilityDynamics\Simplify {
     public function __construct() {
 
       // Set Variables
-      self::$path = untrailingslashit( plugin_dir_path( dirname( __DIR__ ) ) );
-      self::$url  = untrailingslashit( plugin_dir_url( dirname( __DIR__ ) ) );
-      
+      self::$path = untrailingslashit( plugin_dir_path( __DIR__ ) );
+      self::$url  = untrailingslashit( plugins_url( '', __DIR__ ) );
 
       // Initialize hooks.
       add_action( 'after_setup_theme', array( $this, 'after_setup_theme' ) );
@@ -100,7 +99,7 @@ namespace UsabilityDynamics\Simplify {
      *
      */
     public function admin_enqueue_scripts() {
-      wp_enqueue_style( 'wp-simplify' );
+      //wp_enqueue_style( 'wp-simplify' );
       wp_enqueue_style( 'wp-simplify-printer-fixes' );
     }
 
@@ -271,6 +270,16 @@ namespace UsabilityDynamics\Simplify {
 
       echo "<style type='text/css'>";
 
+      echo str_replace( "\n", "", "body.wp_simplify_footer_relocated_links #wpcontent {padding-bottom: 35px;}
+        .wp_simplify_relocated_footer {margin-top: 20px;}
+        .wp_simplify_settings_tabs ul {margin: 0;}
+        .wp_simplify_settings_tabs ul.wps_section_tabs {margin-bottom: 3px;margin-top: 12px;}
+        .wp_simplify_settings_tabs ul.wps_section_tabs li {display: inline;border-radius: 3px 3px 0 0;padding: 5px;margin: 0 7px 6px 7px;line-height: 1;border: 0 solid;}
+        .wp_simplify_settings_tabs ul.wps_section_tabs li a {text-decoration: none;color: #21759B;}
+        .wp_simplify_settings_tabs ul.wps_section_tabs li.ui-tabs-selected {background-color: #F1F1F1;border: 1px solid #DFDFDF;border-bottom: 0 none;}
+        .wp_simplify_settings_tabs .wp-tab-panel {background: #FCFCFC
+        }");
+
       $home_page_id = get_option( 'page_on_front' );
       if( in_array( 'highlight_homepage', $wp_simplify ) && get_option( 'show_on_front' ) == 'page' && !empty( $home_page_id ) ) {
         echo ".wp-list-table #post-{$home_page_id} { background: #FEFBDD; }";
@@ -307,7 +316,6 @@ namespace UsabilityDynamics\Simplify {
     public function general_settings_admin() {
 
       // Load WP-Simplify settings page script
-      wp_enqueue_script( 'wp-simplify' );
       wp_enqueue_script( 'jquery-ui-tabs' );
 
       // Process settings
@@ -340,15 +348,6 @@ namespace UsabilityDynamics\Simplify {
           header( 'Location:  ' . get_bloginfo( "url" ) );
           die();
         }
-      }
-
-      // Register scripts and styles if they can be resolved
-      if( file_exists( self::$path . '/js/wp-simplify-admin.js' ) ) {
-        wp_register_script( 'wp-simplify', self::$url . '/js/wp-simplify-admin.js', array( 'jquery' ) );
-      }
-
-      if( file_exists( self::$path . '/css/wp-simplify-admin.css' ) ) {
-        wp_register_style( 'wp-simplify', self::$url . '/css/wp-simplify-admin.css' );
       }
 
       // Add the field with the names and function to use for our new settings, put it in our new section
@@ -773,6 +772,18 @@ namespace UsabilityDynamics\Simplify {
         $wp_simplify = array();
 
       ?>
+
+      <script type="text/javascript">
+        if( typeof jQuery === 'function' ) {
+
+          jQuery( document ).ready( function() {
+            if( 'function' === typeof jQuery.fn.tabs ) {
+              jQuery( '.wp_simplify_settings_tabs' ).tabs();
+            }
+          });
+
+        }
+      </script>
 
       <input type="hidden" name="wp_simplify_nonce" value="<?php echo wp_create_nonce( 'wp_simplify_update' ); ?>"/>
       <a name="wp_simplify_anchor"></a>
