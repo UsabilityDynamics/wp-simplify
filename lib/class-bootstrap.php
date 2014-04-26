@@ -673,6 +673,10 @@ namespace UsabilityDynamics\Simplify {
         $menu[ 26 ][ 3 ] = 'Online Store';
       }
 
+      if( in_array( 'relocate_w3_total_cache', $wp_simplify ) && $menu[ 100 ][ 0 ] == 'Performance' ) {
+        unset( $menu[ 100 ] );
+      }
+
       if( in_array( 'disable_relocate_admin_menu_links', $wp_simplify ) ) {
         // Hide plugins from menu
         unset( $menu[ 65 ] );
@@ -710,48 +714,59 @@ namespace UsabilityDynamics\Simplify {
       global $submenu;
 
       $this_menu = $submenu;
+
       echo "<span class='wp_simplify_relocated_footer'>";
 
-      if( is_array( $this_menu[ 'plugins.php' ] ) ) {
+      foreach( (array) $this_menu[ 'plugins.php' ] as $data ) {
 
-        foreach( $this_menu[ 'plugins.php' ] as $data ) {
+        if( strpos( $data[ 2 ], '/' ) || !strpos( $data[ 2 ], '.php' ) )
+          $data[ 2 ] = 'plugins.php?page=' . $data[ 2 ];
 
-          if( strpos( $data[ 2 ], '/' ) || !strpos( $data[ 2 ], '.php' ) )
-            $data[ 2 ] = 'plugins.php?page=' . $data[ 2 ];
+        $plugins_menu[ ] = "<a style='font-style: normal;' href='" . admin_url( $data[ 2 ] ) . "'>{$data[0]}</a> ";
 
-          $plugins_menu[ ] = "<a style='font-style: normal;' href='" . admin_url( $data[ 2 ] ) . "'>{$data[0]}</a> ";
+      }
 
+      foreach( (array) $this_menu[ 'options-general.php' ] as $data ) {
+
+        if( strpos( $data[ 2 ], '/' ) || !strpos( $data[ 2 ], '.php' ) || !empty( $data[ 3 ] ) )
+          $data[ 2 ] = 'options-general.php?page=' . $data[ 2 ];
+
+        $options_menu[ ] = "<a style='font-style: normal;' href='" . admin_url( $data[ 2 ] ) . "'>{$data[0]}</a> ";
+
+      }
+
+      foreach( (array) $this_menu[ 'tools.php' ] as $data ) {
+
+        if( strpos( $data[ 2 ], '/' ) || !strpos( $data[ 2 ], '.php' ) )
+          $data[ 2 ] = 'tools.php?page=' . $data[ 2 ];
+
+        $tools_menu[ ] = "<a style='font-style: normal;' href='" . admin_url( $data[ 2 ] ) . "'>{$data[0]}</a> ";
+
+      }
+
+      foreach( (array) $this_menu[ 'w3tc_dashboard' ] as $data ) {
+
+        if( strpos( $data[ 2 ], '/' ) || !strpos( $data[ 2 ], '.php' ) ) {
+          $data[ 2 ] = 'admin.php?page=' . $data[ 2 ];
         }
+
+        $w3tc_dashboard[ ] = "<a style='font-style: normal;' href='" . admin_url( $data[ 2 ] ) . "'>{$data[0]}</a> ";
+      }
+
+      if( $plugins_menu ) {
         echo '<span style="font-style: normal; margin-right: 5px;">Plugins: </span>' . implode( " | ", $plugins_menu ) . "<br />";
-
       }
 
-      if( is_array( $this_menu[ 'options-general.php' ] ) ) {
-
-        foreach( $this_menu[ 'options-general.php' ] as $data ) {
-
-          if( strpos( $data[ 2 ], '/' ) || !strpos( $data[ 2 ], '.php' ) || !empty( $data[ 3 ] ) )
-            $data[ 2 ] = 'options-general.php?page=' . $data[ 2 ];
-
-          $options_menu[ ] = "<a style='font-style: normal;' href='" . admin_url( $data[ 2 ] ) . "'>{$data[0]}</a> ";
-
-        }
+      if( $options_menu ) {
         echo '<span style="font-style: normal; margin-right: 5px;">Settings: </span>' . implode( " | ", $options_menu ) . "<br />";
-
       }
 
-      if( is_array( $this_menu[ 'tools.php' ] ) ) {
+      if( $w3tc_dashboard ) {
+        echo '<span style="font-style: normal; margin-right: 5px;">Performance: </span>' . implode( " | ", $w3tc_dashboard ) . "<br />";
+      }
 
-        foreach( $this_menu[ 'tools.php' ] as $data ) {
-
-          if( strpos( $data[ 2 ], '/' ) || !strpos( $data[ 2 ], '.php' ) )
-            $data[ 2 ] = 'tools.php?page=' . $data[ 2 ];
-
-          $tools_menu[ ] = "<a style='font-style: normal;' href='" . admin_url( $data[ 2 ] ) . "'>{$data[0]}</a> ";
-
-        }
+      if( $tools_menu ) {
         echo '<span style="font-style: normal; margin-right: 5px;">Tools: </span>' . implode( " | ", $tools_menu ) . "<br />";
-
       }
 
       echo "</span>";
@@ -826,19 +841,24 @@ namespace UsabilityDynamics\Simplify {
 
     <div id="wps_miscellaneous" class="wp-tab-panel">
       <ul>
-      <li><input name='wp_simplify[]' id='disable_change_permalinks_button' type='checkbox' value='disable_change_permalinks_button' class='code'  <?php if( in_array( 'disable_change_permalinks_button', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_change_permalinks_button"> Hide the "Change Permalinks" and "Edit" buttons on post & page edit pages.</label>
+      <li><input name='wp_simplify[]' id='disable_change_permalinks_button' type='checkbox' value='disable_change_permalinks_button' class='code'  <?php if( in_array( 'disable_change_permalinks_button', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_change_permalinks_button"> Hide the "Change Permalinks" and "Edit" buttons on post & page edit pages.</label></li>
 
         <?php if (function_exists( 'cforms' )): ?>
-      <li><input name='wp_simplify[]' id='rename_cforms' type='checkbox' value='rename_cforms' class='code'  <?php if( in_array( 'rename_cforms', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="rename_cforms"> Rename "cformsII" to "Forms"  in menu. <span class="description">Phenomenal plugin, not a customer-friendly name.</span></label>
+      <li><input name='wp_simplify[]' id='rename_cforms' type='checkbox' value='rename_cforms' class='code'  <?php if( in_array( 'rename_cforms', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="rename_cforms"> Rename "cformsII" to "Forms"  in menu. <span class="description">Phenomenal plugin, not a customer-friendly name.</span></label></li>
         <?php endif; ?>
 
-        <?php if (class_exists( 'Shopp' )): ?>
-      <li><input name='wp_simplify[]' id='rename_shopp' type='checkbox' value='rename_shopp' class='code'  <?php if( in_array( 'rename_shopp', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="rename_shopp"> Rename "Shopp" to "Online Store" in menu.</label>
-        <?php endif; ?>
-      <li><input name='wp_simplify[]' id='rename_posts' type='checkbox' value='rename_posts' class='code'  <?php if( in_array( 'rename_posts', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="rename_posts"> Rename "Posts" to "News" in menu.</label>
+      <?php if (class_exists( 'Shopp' )): ?>
+      <li><input name='wp_simplify[]' id='rename_shopp' type='checkbox' value='rename_shopp' class='code'  <?php if( in_array( 'rename_shopp', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="rename_shopp"> Rename "Shopp" to "Online Store" in menu.</label></li>
+      <?php endif; ?>
 
-      <li><input name='wp_simplify[]' id='disable_quick_edit_link' type='checkbox' value='disable_quick_edit_link' class='code'  <?php if( in_array( 'disable_quick_edit_link', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_quick_edit_link"> Hide the "Quick Edit" link on post & page overview pages.</label>
-      <li><input name='wp_simplify[]' id='disable_theme_editor' type='checkbox' value='disable_theme_editor' class='code'  <?php if( in_array( 'disable_theme_editor', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_theme_editor"> Disable theme editing for all users via control panel (prevents potential security risk).</label>
+      <li><input name='wp_simplify[]' id='rename_posts' type='checkbox' value='rename_posts' class='code'  <?php if( in_array( 'rename_posts', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="rename_posts"> Rename "Posts" to "News" in menu.</label></li>
+
+      <?php if (defined( 'W3TC' )): ?>
+        <li><label><input name='wp_simplify[]' type='checkbox' value='relocate_w3_total_cache' class='code' <?php if( in_array( 'relocate_w3_total_cache', $wp_simplify ) ) echo " checked='checked'  "; ?> />Move "Performance" into footer.</label></li>
+      <?php endif; ?>
+
+      <li><input name='wp_simplify[]' id='disable_quick_edit_link' type='checkbox' value='disable_quick_edit_link' class='code'  <?php if( in_array( 'disable_quick_edit_link', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_quick_edit_link"> Hide the "Quick Edit" link on post & page overview pages.</label></li>
+      <li><input name='wp_simplify[]' id='disable_theme_editor' type='checkbox' value='disable_theme_editor' class='code'  <?php if( in_array( 'disable_theme_editor', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_theme_editor"> Disable theme editing for all users via control panel (prevents potential security risk).</label></li>
 
       </ul>
     </div>
@@ -847,8 +867,10 @@ namespace UsabilityDynamics\Simplify {
       <ul>
         <li><input name='wp_simplify[]' id='disable_backend_access_to_non_admins' type='checkbox' value='disable_backend_access_to_non_admins' class='code'  <?php if( in_array( 'disable_backend_access_to_non_admins', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_backend_access_to_non_admins"> Disable back-end access to non-administrators. <span class="description">If enabled, on attempt to access /wp-admin, non-level 10 administrators will be forwarded to the frontend. This can be overwritten if uses has "access_backend" capability.</span></label></li>
         <li><input name='wp_simplify[]' id='force_ssl_on_front_end' type='checkbox' value='force_ssl_on_front_end' class='code'  <?php if( in_array( 'force_ssl_on_front_end', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="force_ssl_on_front_end"> Always use SSL on front-end. <span class="description"></span></label></li>
-        <li><input name='wp_simplify[]' id='allow_post_locking' type='checkbox' value='allow_post_locking' class='code'  <?php if( in_array( 'allow_post_locking', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="allow_post_locking"> <?php _e( 'Allow post locking.' ); ?>
-            <span class="description"><?php _( 'Willl show checkbox on post and page editing screens which will let you "lock" posts - or prevent them from being deleted.' ); ?></span></label></li>
+        <li>
+          <input name='wp_simplify[]' id='allow_post_locking' type='checkbox' value='allow_post_locking' class='code'  <?php if( in_array( 'allow_post_locking', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="allow_post_locking"> <?php _e( 'Allow post locking.' ); ?>
+          <span class="description"><?php _( 'Willl show checkbox on post and page editing screens which will let you "lock" posts - or prevent them from being deleted.' ); ?></span></label>
+        $</li>
       </ul>
     </div>
 

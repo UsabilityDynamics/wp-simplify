@@ -51,6 +51,9 @@ Please see the [wp-invoice plugin home page](http://twincitiestech.com/plugins/w
 
 == Change Log ==
 
+= Version 1.4.1 =
+* Added support for W3 Total Cache menu relocation into footer menu.
+
 = Version 1.4.0 =
 * General updates and code cleanup.
 * Restricted Basecamp style to legacy version of WordPress.
