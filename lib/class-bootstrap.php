@@ -481,7 +481,7 @@ namespace UsabilityDynamics\Simplify {
       global $wp_meta_boxes, $_wp_post_type_features;
 
       // Remove Metaboxes
-      if( is_array( $wp_meta_boxes[ $post_type ] ) )
+      if( isset( $wp_meta_boxes[ $post_type ] ) && is_array( $wp_meta_boxes[ $post_type ] ) )
         foreach( $wp_meta_boxes[ $post_type ] as $context_slug => $priority_array ) {
 
           foreach( $priority_array as $priority_slug => $meta_box_array ) {
@@ -494,7 +494,7 @@ namespace UsabilityDynamics\Simplify {
           }
         }
 
-      if( is_array( $_wp_post_type_features[ $post_type ] ) ) {
+      if( isset( $_wp_post_type_features[ $post_type ] ) && is_array( $_wp_post_type_features[ $post_type ] ) ) {
         // Remove features
         foreach( $_wp_post_type_features[ $post_type ] as $feature => $enabled ) {
 
@@ -744,7 +744,7 @@ namespace UsabilityDynamics\Simplify {
 
       }
 
-      foreach( (array) $this_menu[ 'w3tc_dashboard' ] as $data ) {
+      foreach( isset( $this_menu[ 'w3tc_dashboard' ] ) && is_array( $this_menu[ 'w3tc_dashboard' ] ) ? $this_menu[ 'w3tc_dashboard' ] : array() as $data ) {
 
         if( strpos( $data[ 2 ], '/' ) || !strpos( $data[ 2 ], '.php' ) ) {
           $data[ 2 ] = 'admin.php?page=' . $data[ 2 ];
@@ -761,7 +761,7 @@ namespace UsabilityDynamics\Simplify {
         echo '<span style="font-style: normal; margin-right: 5px;">Settings: </span>' . implode( " | ", $options_menu ) . "<br />";
       }
 
-      if( $w3tc_dashboard ) {
+      if( isset( $w3tc_dashboard ) ) {
         echo '<span style="font-style: normal; margin-right: 5px;">Performance: </span>' . implode( " | ", $w3tc_dashboard ) . "<br />";
       }
 
