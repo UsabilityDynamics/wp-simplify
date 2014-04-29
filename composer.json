@@ -1,7 +1,7 @@
 
 {
   "name": "usabilitydynamics/wp-simplify",
-  "type": "library",
+  "type": "wordpress-plugin",
   "description": "WordPress plugin for simplifying the UI.",
   "repository": {
     "type": "git",
@@ -26,9 +26,11 @@
       "homepage": "http://usabilitydynamics.com"
     }
   ],
-  "repositories": [],
+  "repositories": [
+  ],
   "require": {
-    "php": ">=5.3"
+    "php": ">=5.3",
+    "composer/installers": "~1.0"
   },
   "config": {}
 }

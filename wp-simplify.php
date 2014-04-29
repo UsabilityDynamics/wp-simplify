@@ -4,10 +4,10 @@
  * Plugin URI: http://UsabilityDynamics.com/plugins/wp-simplify/
  * Description: Disable comments, posts, tools, hide unapplicable dashboard metaboxes, etc.
  * Author: Usability Dynamics, Inc
- * Version: 1.4.1
+ * Version: 1.4.2
  * Author URI: http://UsabilityDynamics.com
  *
- * Copyright 2011-2013  Usability Dynamics, Inc.   (email : info@UsabilityDynamics.com)
+ * Copyright 2011-2014  Usability Dynamics, Inc.   (email : info@UsabilityDynamics.com)
  *
  * Created by Usability Dynamics, Inc
  * (website: UsabilityDynamics.com       email : info@UsabilityDynamics.com)

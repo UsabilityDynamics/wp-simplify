@@ -13,7 +13,7 @@ namespace UsabilityDynamics\Simplify {
      * @property $version
      * @type {Object}
      */
-    public static $version = '1.4.1';
+    public static $version = '1.4.2';
 
     /**
      * Textdomain String
@@ -90,8 +90,26 @@ namespace UsabilityDynamics\Simplify {
       add_action( 'widgets_init', array( $this, 'widgets_init' ) );
       add_action( 'wp_dashboard_setup', array( $this, 'wp_dashboard_setup' ) );
       add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
+      add_action( 'wp_before_admin_bar_render', array( $this, 'wp_before_admin_bar_render' ), 10 );
+
     }
 
+    public function wp_before_admin_bar_render() {
+      global $wp_admin_bar;
+
+      if( in_array( 'disable_links', (array) get_option( 'wp_simplify' ) ) ) {
+        $wp_admin_bar->remove_menu( 'new-link' );
+      }
+
+      if( in_array( 'disable_wp_logo', (array) get_option( 'wp_simplify' ) ) ) {
+        $wp_admin_bar->remove_menu( 'wp-logo' );
+      }
+
+      if( in_array( 'disable_comments', (array) get_option( 'wp_simplify' ) ) ) {
+        $wp_admin_bar->remove_menu( 'comments' );
+      }
+
+    }
     /**
      * Load global back-end scripts
      *
@@ -800,6 +818,12 @@ namespace UsabilityDynamics\Simplify {
         }
       </script>
 
+      <style typye="text/css">
+        div.wp_simplify_settings_tabs .wp-tab-panel > ul {
+          padding: 15px 0px;
+        }
+      </style>
+
       <input type="hidden" name="wp_simplify_nonce" value="<?php echo wp_create_nonce( 'wp_simplify_update' ); ?>"/>
       <a name="wp_simplify_anchor"></a>
       <div class="wp_simplify_settings_tabs">
@@ -810,71 +834,69 @@ namespace UsabilityDynamics\Simplify {
         <li><a href="#wps_security"><?php _e( 'Security' ); ?></a></li>
       </ul>
 
-    <div id="wps_major_compontents" class="wp-tab-panel">
-      <ul>
-        <li><input name='wp_simplify[]' id='disable_posts' type='checkbox' value='disable_posts' class='code'  <?php if( in_array( 'disable_posts', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_posts"> Disable Posts</label></li>
-        <li><input name='wp_simplify[]' id='disable_pages' type='checkbox' value='disable_pages' class='code'  <?php if( in_array( 'disable_pages', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_pages"> Disable Pages</label></li>
-        <li><input name='wp_simplify[]' id='disable_links' type='checkbox' value='disable_links' class='code'  <?php if( in_array( 'disable_links', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_links"> Disable Links</label></li>
-        <li><input name='wp_simplify[]' id='disable_media' type='checkbox' value='disable_media' class='code'  <?php if( in_array( 'disable_media', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_media"> Disable Media. <span class="description">Images can still be uploaded, this only hides the link from nav menu.</span></label></li>
-        <li><input name='wp_simplify[]' id='disable_comments' type='checkbox' value='disable_comments' class='code' <?php if( in_array( 'disable_comments', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_comments"> Disable Comments. <span class="description">Doesn't affect the front-end.</span></label></li>
-        <li><input name='wp_simplify[]' id='disable_appearance' type='checkbox' value='disable_appearance' class='code'  <?php if( in_array( 'disable_appearance', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_appearance"> Disable Appearance</label></li>
-        <li><input name='wp_simplify[]' id='disable_users' type='checkbox' value='disable_users' class='code'  <?php if( in_array( 'disable_users', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_users"> Disable Users</label></li>
-      </ul>
-    </div>
+      <div id="wps_major_compontents" class="wp-tab-panel">
+        <ul>
+          <li><input name='wp_simplify[]' id='disable_posts' type='checkbox' value='disable_posts' class='code'  <?php if( in_array( 'disable_posts', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_posts"> Disable Posts</label></li>
+          <li><input name='wp_simplify[]' id='disable_pages' type='checkbox' value='disable_pages' class='code'  <?php if( in_array( 'disable_pages', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_pages"> Disable Pages</label></li>
+          <li><input name='wp_simplify[]' id='disable_links' type='checkbox' value='disable_links' class='code'  <?php if( in_array( 'disable_links', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_links"> Disable Links</label></li>
+          <li><input name='wp_simplify[]' id='disable_media' type='checkbox' value='disable_media' class='code'  <?php if( in_array( 'disable_media', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_media"> Disable Media. <span class="description">Images can still be uploaded, this only hides the link from nav menu.</span></label></li>
+          <li><input name='wp_simplify[]' id='disable_comments' type='checkbox' value='disable_comments' class='code' <?php if( in_array( 'disable_comments', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_comments"> Disable Comments. <span class="description">Doesn't affect the front-end.</span></label></li>
+          <li><input name='wp_simplify[]' id='disable_appearance' type='checkbox' value='disable_appearance' class='code'  <?php if( in_array( 'disable_appearance', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_appearance"> Disable Appearance</label></li>
+          <li><input name='wp_simplify[]' id='disable_users' type='checkbox' value='disable_users' class='code'  <?php if( in_array( 'disable_users', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_users"> Disable Users</label></li>
+        </ul>
+      </div>
 
+      <div id="wps_simplify_ui" class="wp-tab-panel">
+        <ul>
+          <li><input name='wp_simplify[]' id='disable_useless_metaboxes' type='checkbox' value='disable_useless_metaboxes' class='code'  <?php if( in_array( 'disable_useless_metaboxes', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_useless_metaboxes"> Clean up editor screen. <span class="description">Disable pingback, author, slug, and page attribute metaboxes.</span></label></li>
+          <li><input name='wp_simplify[]' id='disable_relocate_admin_menu_links' type='checkbox' value='disable_relocate_admin_menu_links' class='code'  <?php if( in_array( 'disable_relocate_admin_menu_links', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_relocate_admin_menu_links"> Relocate Settings, Tools and Plugins into Footer Text.</label></li>
+          <li><input name='wp_simplify[]' id='highlight_homepage' type='checkbox' value='highlight_homepage' class='code'  <?php if( in_array( 'highlight_homepage', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="highlight_homepage"> If front page is selected to be a static page, highlight it in back-end.</label></li>
+          <li><input name='wp_simplify[]' id='disable_wp_logo' type='checkbox' value='disable_wp_logo' class='code'  <?php if( in_array( 'disable_wp_logo', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_wp_logo"> Hide the WP logo in the top left corner.</label></li>
+          <li><input name='wp_simplify[]' id='disable_right_now_widget' type='checkbox' value='disable_right_now_widget' class='code'  <?php if( in_array( 'disable_right_now_widget', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_right_now_widget"> Disable 'Right Now' Dashboard Metabox.  </label></li>
+          <li><input name='wp_simplify[]' id='disable_dashboard_metaboxes' type='checkbox' value='disable_dashboard_metaboxes' class='code'  <?php if( in_array( 'disable_dashboard_metaboxes', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_dashboard_metaboxes"> Better yet, disable <b>all</b> default dashboard metaboxes.</label></li>
+          <li><input name='wp_simplify[]' id='disable_pointers' type='checkbox' value='disable_pointers' class='code' <?php if( in_array( 'disable_pointers', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_pointers"> Disable WP 3.3 tool tips for all users.</label></li>
+          <?php if( version_compare( get_bloginfo( 'version' ), '3.0.0', '<' ) ) { ?>
+            <li><input name='wp_simplify[]' id='basecamp_style' type='checkbox' value='basecamp_style' class='code'  <?php if( in_array( 'basecamp_style', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="basecamp_style"> Force Basecamp admin style for all users.</label></li>
+          <?php } ?>
+        </ul>
+      </div>
 
-    <div id="wps_simplify_ui" class="wp-tab-panel">
-      <ul>
-        <li><input name='wp_simplify[]' id='disable_useless_metaboxes' type='checkbox' value='disable_useless_metaboxes' class='code'  <?php if( in_array( 'disable_useless_metaboxes', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_useless_metaboxes"> Clean up editor screen. <span class="description">Disable pingback, author, slug, and page attribute metaboxes.</span></label></li>
-        <li><input name='wp_simplify[]' id='disable_relocate_admin_menu_links' type='checkbox' value='disable_relocate_admin_menu_links' class='code'  <?php if( in_array( 'disable_relocate_admin_menu_links', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_relocate_admin_menu_links"> Relocate Settings, Tools and Plugins into Footer Text.</label></li>
-        <li><input name='wp_simplify[]' id='highlight_homepage' type='checkbox' value='highlight_homepage' class='code'  <?php if( in_array( 'highlight_homepage', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="highlight_homepage"> If front page is selected to be a static page, highlight it in back-end.</label></li>
-        <li><input name='wp_simplify[]' id='disable_wp_logo' type='checkbox' value='disable_wp_logo' class='code'  <?php if( in_array( 'disable_wp_logo', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_wp_logo"> Hide the WP logo in the top left corner.</label></li>
-        <li><input name='wp_simplify[]' id='disable_right_now_widget' type='checkbox' value='disable_right_now_widget' class='code'  <?php if( in_array( 'disable_right_now_widget', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_right_now_widget"> Disable 'Right Now' Dashboard Metabox.  </label></li>
-        <li><input name='wp_simplify[]' id='disable_dashboard_metaboxes' type='checkbox' value='disable_dashboard_metaboxes' class='code'  <?php if( in_array( 'disable_dashboard_metaboxes', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_dashboard_metaboxes"> Better yet, disable <b>all</b> default dashboard metaboxes.</label></li>
-        <?php if( version_compare( get_bloginfo( 'version' ), '3.0.0', '<' ) ) { ?>
-          <li><input name='wp_simplify[]' id='basecamp_style' type='checkbox' value='basecamp_style' class='code'  <?php if( in_array( 'basecamp_style', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="basecamp_style"> Force Basecamp admin style for all users.</label></li>
-        <?php } ?>
-        <li><input name='wp_simplify[]' id='disable_pointers' type='checkbox' value='disable_pointers' class='code'  <?php if( in_array( 'disable_pointers', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_pointers"> Disable WP 3.3 tool tips for all users.</label></li>
-      </ul>
-    </div>
+      <div id="wps_miscellaneous" class="wp-tab-panel">
+        <ul>
+        <li><input name='wp_simplify[]' id='disable_change_permalinks_button' type='checkbox' value='disable_change_permalinks_button' class='code'  <?php if( in_array( 'disable_change_permalinks_button', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_change_permalinks_button"> Hide the "Change Permalinks" and "Edit" buttons on post & page edit pages.</label></li>
 
+          <?php if (function_exists( 'cforms' )): ?>
+        <li><input name='wp_simplify[]' id='rename_cforms' type='checkbox' value='rename_cforms' class='code'  <?php if( in_array( 'rename_cforms', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="rename_cforms"> Rename "cformsII" to "Forms"  in menu. <span class="description">Phenomenal plugin, not a customer-friendly name.</span></label></li>
+          <?php endif; ?>
 
-    <div id="wps_miscellaneous" class="wp-tab-panel">
-      <ul>
-      <li><input name='wp_simplify[]' id='disable_change_permalinks_button' type='checkbox' value='disable_change_permalinks_button' class='code'  <?php if( in_array( 'disable_change_permalinks_button', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_change_permalinks_button"> Hide the "Change Permalinks" and "Edit" buttons on post & page edit pages.</label></li>
-
-        <?php if (function_exists( 'cforms' )): ?>
-      <li><input name='wp_simplify[]' id='rename_cforms' type='checkbox' value='rename_cforms' class='code'  <?php if( in_array( 'rename_cforms', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="rename_cforms"> Rename "cformsII" to "Forms"  in menu. <span class="description">Phenomenal plugin, not a customer-friendly name.</span></label></li>
+        <?php if (class_exists( 'Shopp' )): ?>
+        <li><input name='wp_simplify[]' id='rename_shopp' type='checkbox' value='rename_shopp' class='code'  <?php if( in_array( 'rename_shopp', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="rename_shopp"> Rename "Shopp" to "Online Store" in menu.</label></li>
         <?php endif; ?>
 
-      <?php if (class_exists( 'Shopp' )): ?>
-      <li><input name='wp_simplify[]' id='rename_shopp' type='checkbox' value='rename_shopp' class='code'  <?php if( in_array( 'rename_shopp', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="rename_shopp"> Rename "Shopp" to "Online Store" in menu.</label></li>
-      <?php endif; ?>
+        <li><input name='wp_simplify[]' id='rename_posts' type='checkbox' value='rename_posts' class='code'  <?php if( in_array( 'rename_posts', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="rename_posts"> Rename "Posts" to "News" in menu.</label></li>
 
-      <li><input name='wp_simplify[]' id='rename_posts' type='checkbox' value='rename_posts' class='code'  <?php if( in_array( 'rename_posts', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="rename_posts"> Rename "Posts" to "News" in menu.</label></li>
+        <?php if (defined( 'W3TC' )): ?>
+          <li><label><input name='wp_simplify[]' type='checkbox' value='relocate_w3_total_cache' class='code' <?php if( in_array( 'relocate_w3_total_cache', $wp_simplify ) ) echo " checked='checked'  "; ?> />Move "Performance" into footer.</label></li>
+        <?php endif; ?>
 
-      <?php if (defined( 'W3TC' )): ?>
-        <li><label><input name='wp_simplify[]' type='checkbox' value='relocate_w3_total_cache' class='code' <?php if( in_array( 'relocate_w3_total_cache', $wp_simplify ) ) echo " checked='checked'  "; ?> />Move "Performance" into footer.</label></li>
-      <?php endif; ?>
+        <li><input name='wp_simplify[]' id='disable_quick_edit_link' type='checkbox' value='disable_quick_edit_link' class='code'  <?php if( in_array( 'disable_quick_edit_link', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_quick_edit_link"> Hide the "Quick Edit" link on post & page overview pages.</label></li>
+        <li><input name='wp_simplify[]' id='disable_theme_editor' type='checkbox' value='disable_theme_editor' class='code'  <?php if( in_array( 'disable_theme_editor', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_theme_editor"> Disable theme editing for all users via control panel (prevents potential security risk).</label></li>
 
-      <li><input name='wp_simplify[]' id='disable_quick_edit_link' type='checkbox' value='disable_quick_edit_link' class='code'  <?php if( in_array( 'disable_quick_edit_link', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_quick_edit_link"> Hide the "Quick Edit" link on post & page overview pages.</label></li>
-      <li><input name='wp_simplify[]' id='disable_theme_editor' type='checkbox' value='disable_theme_editor' class='code'  <?php if( in_array( 'disable_theme_editor', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_theme_editor"> Disable theme editing for all users via control panel (prevents potential security risk).</label></li>
+        </ul>
+      </div>
 
-      </ul>
-    </div>
+      <div id="wps_security" class="wp-tab-panel">
+        <ul>
+          <li><input name='wp_simplify[]' id='disable_backend_access_to_non_admins' type='checkbox' value='disable_backend_access_to_non_admins' class='code'  <?php if( in_array( 'disable_backend_access_to_non_admins', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_backend_access_to_non_admins"> Disable back-end access to non-administrators. <span class="description">If enabled, on attempt to access /wp-admin, non-level 10 administrators will be forwarded to the frontend. This can be overwritten if uses has "access_backend" capability.</span></label></li>
+          <li><input name='wp_simplify[]' id='force_ssl_on_front_end' type='checkbox' value='force_ssl_on_front_end' class='code'  <?php if( in_array( 'force_ssl_on_front_end', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="force_ssl_on_front_end"> Always use SSL on front-end. <span class="description"></span></label></li>
+          <li>
+            <input name='wp_simplify[]' id='allow_post_locking' type='checkbox' value='allow_post_locking' class='code'  <?php if( in_array( 'allow_post_locking', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="allow_post_locking"> <?php _e( 'Allow post locking.' ); ?>
+            <span class="description"><?php _( 'Willl show checkbox on post and page editing screens which will let you "lock" posts - or prevent them from being deleted.' ); ?></span></label>
+          </li>
+        </ul>
+      </div>
 
-    <div id="wps_security" class="wp-tab-panel">
-      <ul>
-        <li><input name='wp_simplify[]' id='disable_backend_access_to_non_admins' type='checkbox' value='disable_backend_access_to_non_admins' class='code'  <?php if( in_array( 'disable_backend_access_to_non_admins', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="disable_backend_access_to_non_admins"> Disable back-end access to non-administrators. <span class="description">If enabled, on attempt to access /wp-admin, non-level 10 administrators will be forwarded to the frontend. This can be overwritten if uses has "access_backend" capability.</span></label></li>
-        <li><input name='wp_simplify[]' id='force_ssl_on_front_end' type='checkbox' value='force_ssl_on_front_end' class='code'  <?php if( in_array( 'force_ssl_on_front_end', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="force_ssl_on_front_end"> Always use SSL on front-end. <span class="description"></span></label></li>
-        <li>
-          <input name='wp_simplify[]' id='allow_post_locking' type='checkbox' value='allow_post_locking' class='code'  <?php if( in_array( 'allow_post_locking', $wp_simplify ) ) echo " checked='checked'  "; ?>/><label for="allow_post_locking"> <?php _e( 'Allow post locking.' ); ?>
-          <span class="description"><?php _( 'Willl show checkbox on post and page editing screens which will let you "lock" posts - or prevent them from being deleted.' ); ?></span></label>
-        $</li>
-      </ul>
-    </div>
-
-      </div><?php /* End WP-Simplify Tabs */ ?>
+      </div>
 
     <?php
 
